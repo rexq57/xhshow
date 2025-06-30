@@ -6,3 +6,5 @@
 .tmp.json
 .package.json
 .package-lock.json
+xhshow.egg-info
+__pycache__
