@@ -12,16 +12,10 @@ __description__ = "XiaoHongShu data extraction and processing tools"
 from . import encrypt
 from . import xhs
 from . import code
+from .encrypt.xs_encrypt import XsEncrypt
 
-# 导出常用类和函数
-try:
-    from .encrypt.xs_encrypt import XsEncrypt
-    __all__ = ['encrypt', 'xhs', 'XsEncrypt', 'code']
-except ImportError:
-    # 如果导入失败，只导出模块
-    __all__ = ['encrypt', 'xhs', 'code']
+__all__ = ['encrypt', 'xhs', 'XsEncrypt', 'code']
 
-__all__ = []
 
 def get_version():
     """获取版本信息"""
