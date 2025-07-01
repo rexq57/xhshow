@@ -1,38 +1,43 @@
 import base64
 import json
 import random
-from code import XhsDesKeys
 
 import cv2
 import numpy as np
 from curl_cffi.requests import AsyncSession
 from pyDes import ECB, PAD_PKCS5, des
 
-from config import bg_nums
+from ..config import bg_nums
 
+class XhsDesKeys:
+    DECODE_CAPTCHA_INFO: str = "76a2171c"
+    ENCODE_MOUSE_END: str = "WquqhEkd"
+    ENCODE_TIME: str = "vPMvCY4K"
+    ENCODE_TRACK: str = "PYrm8rMk"
+    ENCODE_WIDTH: str = "WquqhEkd"
 
 class CaptchaSolver:
     def __init__(self):
         pass
 
-    async def decrypt_data(self, encoded_data: str, decode_key: str = XhsDesKeys.DECODE_CAPTCHA_INFO) -> str:
+    def decrypt_data(self, encoded_data: str, decode_key: str = XhsDesKeys.DECODE_CAPTCHA_INFO) -> str:
         """解密数据"""
         des_obj = des(decode_key, ECB, padmode=PAD_PKCS5)
         return des_obj.decrypt(base64.b64decode(encoded_data)).decode()
 
-    async def encrypt_data(self, key: str, data: str) -> str:
+    def encrypt_data(self, key: str, data: str) -> str:
         """加密数据"""
         des_obj = des(key, ECB, padmode=PAD_PKCS5)
         encrypted = des_obj.encrypt(data.encode())
         return base64.b64encode(encrypted).decode()
 
-    async def decrypt_captcha_info(self, captcha_data: dict) -> tuple[str, dict]:
+    def decrypt_captcha_info(self, captcha_data: dict) -> tuple[str, dict]:
         """解密验证码信息"""
         rid = captcha_data['data']['rid']
-        captcha_info = json.loads(await self.decrypt_data(captcha_data['data']['captchaInfo']))
+        captcha_info = json.loads(self.decrypt_data(captcha_data['data']['captchaInfo']))
         return rid, captcha_info
 
-    async def calculate_mse(self, img1, img2) -> float:
+    def calculate_mse(self, img1, img2) -> float:
         """计算均方误差"""
         img2_gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
         img_resized = cv2.resize(img2_gray, (400, 400))
@@ -50,7 +55,7 @@ class CaptchaSolver:
         mse = np.mean(np.square(diff))
         return mse
 
-    async def get_distance(self, target_x: int) -> list[list[int]]:
+    def get_distance(self, target_x: int) -> list[list[int]]:
         """生成距离轨迹"""
         trace = self.generate_trace(target_x)
         return trace
@@ -163,7 +168,7 @@ class CaptchaSolver:
 
     async def get_distance_from_info(self, captcha_data: dict) -> None | list[list[int]]:
         """根据验证码数据获取距离"""
-        rid, captcha_info = await self.decrypt_captcha_info(captcha_data)
+        rid, captcha_info = self.decrypt_captcha_info(captcha_data)
         bg_num = bg_nums.get(captcha_info['backgroundUrl'].split('/')[-1].split('.')[0], None)
 
         if not bg_num:
@@ -178,9 +183,10 @@ class CaptchaSolver:
         img1 = cv2.imread(f'./static/target/center_{bg_num}.png', cv2.IMREAD_COLOR)
         center = (img2.shape[1] // 2, img2.shape[0] // 2)
 
-        angle_dict = {angle: await self.calculate_mse(img1,
+        angle_dict = {angle: self.calculate_mse(img1,
                                                       cv2.warpAffine(img2, cv2.getRotationMatrix2D(center, -angle, 1.0),
                                                                      img2.shape[1::-1]))
                       for angle in range(1, 361, 2)}
 
-        return await self.get_distance(int((min(angle_dict, key=angle_dict.get) * 360) / 285))
+        best_angle = min(angle_dict.keys(), key=lambda x: angle_dict[x])
+        return self.get_distance(int((best_angle * 360) / 285))

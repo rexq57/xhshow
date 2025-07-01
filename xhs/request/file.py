@@ -120,5 +120,4 @@ class Uploader:
         )
 
         return {
-            "PartNumber": chunk_number,
-            "E
+            "PartNumber": chunk_number}

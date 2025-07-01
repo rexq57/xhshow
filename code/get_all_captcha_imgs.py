@@ -9,7 +9,7 @@ from typing import Dict, List
 
 from pyDes import ECB, PAD_PKCS5, des
 
-from encrypt import XsEncrypt
+from ..encrypt import XsEncrypt
 from xhs.request.AsyncRequestFramework import AsyncRequestFramework
 
 
@@ -108,7 +108,7 @@ class CaptchaService:
         if not response:
             return {}
 
-        captcha_info = json.loads(await self.solver.decrypt_data(
+        captcha_info = json.loads(self.solver.decrypt_data(
             encoded_data=response['data']['captchaInfo']
         ))
 

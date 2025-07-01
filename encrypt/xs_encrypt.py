@@ -8,7 +8,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from typeguard import typechecked
 
-from config import xn, xn64
+from ..config import xn, xn64
 
 
 class XsEncrypt:

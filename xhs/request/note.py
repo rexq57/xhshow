@@ -4,9 +4,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from config import replacements
-from extractor import extract_initial_state
-from xhs.request.AsyncRequestFramework import AsyncRequestFramework
+from ...config import replacements
+from ...extractor import extract_initial_state
+from .AsyncRequestFramework import AsyncRequestFramework
 
 
 class NoteType(Enum):
