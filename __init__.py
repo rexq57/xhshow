@@ -12,9 +12,11 @@ __description__ = "XiaoHongShu data extraction and processing tools"
 from . import encrypt
 from . import xhs
 from . import code
+from .schemas.xsc.redcaptcha import CaptchaXSC, CaptchaXSCV2
 from .encrypt.xs_encrypt import XsEncrypt
+from .encrypt.xsc_encrypt import XscEncrypt
 
-__all__ = ['encrypt', 'xhs', 'XsEncrypt', 'code']
+__all__ = ['encrypt', 'xhs', 'XsEncrypt', 'code', 'CaptchaXSC', 'CaptchaXSCV2', 'XscEncrypt']
 
 
 def get_version():
