@@ -5,7 +5,7 @@ import urllib.parse
 from ..config import ie, lookup
 
 
-class XscEncrypt:
+class XscEncryptV2:
     """
     提供字符串加密与Base64编码的功能
     """
@@ -47,6 +47,8 @@ class XscEncrypt:
         Returns:
             Base64字符串
         """
+        lookup = "LVoJPiCN2R8G90yg+hmFHuacZ5H1ODA7MhfEbW4P+oP1awhxdm9pksjXeKNBl/1SQ/oB2s1FtCbdmO3KfGAPj1SdAu/d64oInGaPnEsUFLn3uTKPDWcdZWfBE2e+OWPkv/e0P4dGbYEoK7OQwB9SaA6NJ1z98G/1WTH3xA5hwSXjrM0wPVUPH47D21rA8sS5/vIj1BLJ++VqXvT3LSRA2="
+        
         return (lookup[(e >> 18) & 63] + lookup[(e >> 12) & 63] +
                 lookup[(e >> 6) & 63] + lookup[e & 63])
 
@@ -65,7 +67,7 @@ class XscEncrypt:
         for b in range(t, r, 3):
             if b + 2 < len(e):  # 确保有完整的三个字节
                 triplet = (e[b] << 16) + (e[b + 1] << 8) + e[b + 2]
-                chunk = await XscEncrypt.triplet_to_base64(triplet)
+                chunk = await XscEncryptV2.triplet_to_base64(triplet)
                 chunks.append(chunk)
         return ''.join(chunks)
 
@@ -73,22 +75,33 @@ class XscEncrypt:
     async def b64_encode(e) -> str:
         """
         将整数列表编码为Base64格式
+        完全模拟JavaScript版本的逻辑：分块处理+剩余字节处理
         Args:
             e: 整数列表
         Returns:
             Base64字符串
         """
+        lookup = "LVoJPiCN2R8G90yg+hmFHuacZ5H1ODA7MhfEbW4P+oP1awhxdm9pksjXeKNBl/1SQ/oB2s1FtCbdmO3KfGAPj1SdAu/d64oInGaPnEsUFLn3uTKPDWcdZWfBE2e+OWPkv/e0P4dGbYEoK7OQwB9SaA6NJ1z98G/1WTH3xA5hwSXjrM0wPVUPH47D21rA8sS5/vIj1BLJ++VqXvT3LSRA2="
+        
         P = len(e)
         W = P % 3
         Z = P - W
-        result = [await XscEncrypt.encode_chunk(e, i, min(i + 16383, Z)) for i in range(0, Z, 16383)]
+        
+        # 分块处理完整的3字节组
+        result = []
+        for i in range(0, Z, 16383):  # 每次处理最多16383个字节
+            chunk_end = min(i + 16383, Z)
+            chunk = await XscEncryptV2.encode_chunk(e, i, chunk_end)
+            result.append(chunk)
 
+        # 处理剩余字节
         if W == 1:
             F = e[-1]
             result.append(lookup[F >> 2] + lookup[(F << 4) & 63] + "==")
         elif W == 2:
             F = (e[-2] << 8) + e[-1]
             result.append(lookup[F >> 10] + lookup[(F >> 4) & 63] + lookup[(F << 2) & 63] + "=")
+        
         return "".join(result)
 
     @staticmethod
@@ -127,9 +140,9 @@ class XscEncrypt:
         Returns:
             xsc
         """
-        x9 = await XscEncrypt.mrc(str(xt)+xs+b1)
+        x9 = str(await XscEncryptV2.mrc(xt+xs+b1))
         st = json.dumps({
-            "s0": 1, # 1.3 版本的s0为5
+            "s0": 5,
             "s1": "",
             "x0": "1",
             "x1": x1,
@@ -137,20 +150,20 @@ class XscEncrypt:
             "x3": 'login',
             "x4": x4,
             "x5": a1,
-            "x6": int(xt),
+            "x6": xt,
             "x7": xs,
             "x8": b1,
             "x9": x9,
             # "x10": random.randint(10, 29)
-            "x10": 2 # 24
+            "x10": 24
         }, separators=(",", ":"), ensure_ascii=False)
-        return await XscEncrypt.encrypt_encode_utf8(st)
+        return await XscEncryptV2.encrypt_encode_utf8(st)
 
 
 if __name__ == '__main__':
     import asyncio
 
-    t = asyncio.run(XscEncrypt.encrypt_xsc(
+    t = asyncio.run(XscEncryptV2.encrypt_xsc(
         xs="XYW_eyJzaWduU3ZuIjoiNTYiLCJzaWduVHlwZSI6IngyIiwiYXBwSWQiOiJ4aHMtcGMtd2ViIiwic2lnblZlcnNpb24iOiIxIiwicGF5bG9hZCI6ImMyZmU4Nzc4MmFiY2I2YTYzOTFhOTY0MjAyMGI3ZmFjODQ2YjUyMjZmNDIzMmQ5Mjc5YmI1OTYzNjg5NTBlYzg0MzkyZGU3OTY2Y2JkNWQxMzc3NDgzOWJmZTdhNmRjNzEwNDYzMjgzY2ZlNTc3YTcyYTE5ZDhiZDhkMTY4NTQzMGUxNmEwMDc4ZmNhZWE1MzY1NDY0ZjBkYjhhOThhODQ0MmQ2NTg0ODNlNzA5Y2RhNWZmNTk2ZThkMDQwNDQzMjg1OGEwMWYzMGU5OTE3MDVmYWM2MTM3MDU1MGQ3MTkwYjhkMWJkYjM2NjVmNjJjMzQ4YWI0ZTgwYjE0ZjgxNTRjYjMyZGFiMWJiYTZlNzdjZmJkNjA4MTQ1YmNlODc2NDhkNDllYzM2ZDZlMzU2ZjJlZWY5ODEyYWFlN2EwZmZjZjljOGVkZDkxOWIzODJhYTEwMWE5Y2JjOWMxZDVjNmIyYjY3N2M5YjFiYTVlMDU0ZTQ3YjdiN2RiM2NjZWQyZWJjODY2Y2Y4NmRjYjg5MjFkMzA5OTQxMDI3Y2ZjNGIzIn0=",
         xt="1732352811091",
         platform="xhs-pc-web",

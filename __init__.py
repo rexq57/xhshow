@@ -15,8 +15,9 @@ from . import code
 from .schemas.xsc.redcaptcha import CaptchaXSC, CaptchaXSCV2
 from .encrypt.xs_encrypt import XsEncrypt
 from .encrypt.xsc_encrypt import XscEncrypt
+from .encrypt.generate_local_id import generate_local_id
 
-__all__ = ['encrypt', 'xhs', 'XsEncrypt', 'code', 'CaptchaXSC', 'CaptchaXSCV2', 'XscEncrypt']
+__all__ = ['encrypt', 'xhs', 'XsEncrypt', 'code', 'CaptchaXSC', 'CaptchaXSCV2', 'XscEncrypt', 'generate_local_id']
 
 
 def get_version():

@@ -5,6 +5,6 @@ class CaptchaXSC:
 
 class CaptchaXSCV2:
     platform = "login"
-    x1 = "4.0.8",
-    x4="0.10.14",
+    x1 = "4.0.8"
+    x4="0.10.14"
     b1="I38rHdgsjopgIvesdVwgIC+oIELmBZ5e3VwXLgFTIxS3bqwErFeexd0ekncAzMFYnqthIhJeSBMDKutRI3KsYorWHPtGrbV0P9WfIi/eWc6eYqtyQApPI37ekmR6QL+5Ii6sdneeSfqYHqwl2qt5B0DBIx+PGDi/sVtkIxdsxuwr4qtiIhuaIE3e3LV0I3VTIC7e0utl2ADmsLveDSKsSPw5IEvsiVtJOqw8BuwfPpdeTFWOIx4TIiu6ZPwrPut5IvlaLbgs3qtxIxes1VwHIkumIkIyejgsY/WTge7eSqte/D7sDcpipedeYrDtIC6eDVw2IENsSqtlnlSuNjVtIx5e1qt3bmAeVn8LIESLIEk8+9DUIvzy4I8OIic7ZPwFIviR4o/sDLds6PwVIC7eSd7sf0k4IEve6WGMtVwUIids3s/sxZNeiVtbcUeeYVwRIvM/z06eSuwvgf7sSqweIxltIxZSouwOgVwpsoTHPW5ef7NekuwcIEosSgoe1LuMIiNeWL0sxdh5IiJsxPw9IhR9JPwJPutWIv3e1Vt1IiNs1qw5IEKsdVtFtuw4sqwFIvhvIxqzGniRKWoexVtUIhW4Ii0edqwpBlb2peJsWU4TIiGb4PtOsqwEIvNexutd+pdeVYdsVDEbIhos3odskqt8pqwQIvNeSPwvIieeT/ubIveeSBveDPtXIx0sVqw64B8qIkWJIvvsxFOekaKsDYeeSqwoIkpgIEpYzPwqIxGSIE7eirqSwnvs0VtZIhpBbut14lNedM0eYPwpmPwZIC+7IiGy/VwttVtaIC5e0pesVPwFJqwBIhW="
